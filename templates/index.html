@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>JEMI DevOps Control Center</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/jemi.css') }}?v=3">
+</head>
+<body>
+<div class="scrim" id="scrim"></div>
+<div class="shell">
+<aside class="side" id="side" aria-label="Primary">
+  <div class="brand"><span class="mark" aria-hidden="true"></span><div><b>JEMI</b><small>DevOps</small></div></div>
+  <nav class="nav">
+    <a href="#overview"><span class="ic" aria-hidden="true">◈</span><span class="lb">Overview</span><i class="nd" data-nav="backend"></i></a>
+    <a href="#monitoring"><span class="ic" aria-hidden="true">▤</span><span class="lb">System Monitoring</span><i class="nd" data-nav="backend"></i></a>
+    <a href="#health"><span class="ic" aria-hidden="true">♥</span><span class="lb">Application Health</span><i class="nd" data-nav="backend"></i></a>
+    <a href="#docker"><span class="ic" aria-hidden="true">▣</span><span class="lb">Docker Containers</span><i class="nd" data-nav="docker"></i></a>
+    <a href="#deploy"><span class="ic" aria-hidden="true">▲</span><span class="lb">Deployment Center</span><i class="nd" data-nav="deployments"></i></a>
+    <a href="#incidents"><span class="ic" aria-hidden="true">⚠</span><span class="lb">Incident Monitor</span><i class="nd" data-nav="incidents"></i></a>
+    <a href="#pipeline"><span class="ic" aria-hidden="true">⚙</span><span class="lb">GitHub Actions</span><i class="nd" data-nav="github"></i></a>
+    <a href="#settings"><span class="ic" aria-hidden="true">✦</span><span class="lb">Settings</span></a>
+  </nav>
+  <div class="conn" data-conn="connecting"><i class="dot"></i><div><b data-f="conn">Connecting…</b><small>Last update <span data-f="last">N/A</span></small></div></div>
+  <small class="muted">JEMI DevOps Control Center<br>v0.2.0 · Development Environment</small>
+</aside>
+
+<div class="main">
+<header class="top" id="overview">
+  <button class="btn icon" id="menu" aria-label="Open navigation" aria-expanded="false">☰</button>
+  <div class="title"><h1>DEVOPS CONTROL CENTER</h1><small id="sub">MONITOR · DEPLOY · OBSERVE · STAY AHEAD</small></div>
+  <div class="conn mini" data-conn="connecting"><i class="dot"></i><div><b data-f="conn">Connecting…</b><small>Last update <span data-f="last">N/A</span></small></div></div>
+  <div class="clock"><small id="date"></small><b id="clock"></b></div>
+  <button class="btn" id="refresh">Refresh</button>
+</header>
+
+<section class="kpis" data-view="overview monitoring" aria-label="Infrastructure utilization">
+{% for k, t in [('cpu','CPU utilization'),('mem','Memory utilization'),('disk','Disk utilization')] %}
+  <article class="panel kpi">
+    <h3>{{ t }}</h3>
+    <div class="kpi-body">
+      <div class="ring" data-ring="{{ k }}"><svg viewBox="0 0 80 80" aria-hidden="true"><circle class="trk" cx="40" cy="40" r="34"/><circle class="bar" cx="40" cy="40" r="34" pathLength="100"/></svg><b data-f="{{ k }}">N/A</b></div>
+      <div class="kpi-side"><canvas class="spark" data-spark="{{ k }}" aria-hidden="true"></canvas><span data-f="{{ k }}-sub">Waiting for data</span></div>
+    </div>
+    <small class="muted">Updated <span data-f="{{ k }}-ts">N/A</span></small>
+  </article>
+{% endfor %}
+  <article class="panel kpi">
+    <h3>Network activity</h3>
+    <dl class="net">
+      <div><dt>Sent (total)</dt><dd data-f="sent">N/A</dd></div>
+      <div><dt>Received (total)</dt><dd data-f="recv">N/A</dd></div>
+      <div><dt>Upload rate</dt><dd data-f="up">Collecting…</dd></div>
+      <div><dt>Download rate</dt><dd data-f="down">Collecting…</dd></div>
+    </dl>
+    <small class="muted">Rates calculated between samples · updated <span data-f="net-ts">N/A</span></small>
+  </article>
+</section>
+
+<section class="work" id="monitoring" data-view="overview monitoring health" aria-label="Observability">
+  <article class="panel a-cpu" data-view="overview monitoring"><h3>CPU usage history <small data-f="interval"></small></h3>
+    <div class="chart"><canvas data-chart="cpu" role="img" aria-label="CPU usage history chart"></canvas><p class="empty" data-empty="cpu">Collecting telemetry…</p></div></article>
+  <article class="panel a-mem" data-view="overview monitoring"><h3>Memory usage history <small data-f="interval"></small></h3>
+    <div class="chart"><canvas data-chart="mem" role="img" aria-label="Memory usage history chart"></canvas><p class="empty" data-empty="mem">Collecting telemetry…</p></div></article>
+  <div class="core a-core" data-view="overview health" aria-label="JEMI Core"><i class="r r1"></i><i class="r r2"></i><i class="r r3"></i><div class="orb"><b>JEMI</b><small>CORE</small></div></div>
+  <article class="panel a-sys" data-view="overview monitoring"><h3>System information</h3>
+    <dl class="info">
+      <div><dt>Hostname</dt><dd data-f="host">N/A</dd></div><div><dt>Operating system</dt><dd data-f="os">N/A</dd></div>
+      <div><dt>Logical cores</dt><dd data-f="cores">N/A</dd></div><div><dt>Total memory</dt><dd data-f="memtotal">N/A</dd></div>
+      <div><dt>Total disk</dt><dd data-f="disktotal">N/A</dd></div><div><dt>Last metrics update</dt><dd data-f="stamp">N/A</dd></div>
+    </dl></article>
+  <article class="panel a-health" id="health" data-view="overview health"><h3>Application health</h3>
+    <div class="hbox" data-hstate="unknown"><i class="dot"></i><div><b data-f="hstatus">Checking…</b><small data-f="hmsg">Waiting for /api/health</small></div></div>
+    <dl class="info">
+      <div><dt>HTTP status</dt><dd data-f="hhttp">N/A</dd></div><div><dt>Response time</dt><dd data-f="hms">N/A</dd></div><div><dt>Last checked</dt><dd data-f="hlast">N/A</dd></div>
+    </dl></article>
+</section>
+
+{% macro head(t, d, k=none, off='NOT CONFIGURED') %}<header class="phead"><div><h2>{{ t }}</h2><p>{{ d }}</p></div>{% if k %}<span class="tag" data-integ="{{ k }}" data-off="{{ off }}">{{ off }}</span>{% endif %}</header>{% endmacro %}
+{% macro stats(items) %}<div class="stats">{% for id, l in items %}<div class="stat"><small>{{ l }}</small><b data-f="{{ id }}">N/A</b></div>{% endfor %}</div>{% endmacro %}
+{% macro steps(items) %}<ol class="steps">{% for t, d in items %}<li><b>{{ t }}</b><span class="muted">{{ d }}</span></li>{% endfor %}</ol>{% endmacro %}
+{% macro ul(cls, items) %}<ul class="{{ cls }}">{% for i in items %}<li>{{ i }}</li>{% endfor %}</ul>{% endmacro %}
+{% macro flow(name, items) %}<ol class="pipe" data-flow="{{ name }}">{% for l, g, k in items %}<li class="node" data-key="{{ k }}" data-state="notconfigured"><span class="ico" aria-hidden="true">{{ g }}</span><b>{{ l }}</b><small>Not configured</small></li>{% endfor %}</ol>{% endmacro %}
+{% macro toolbar(id, ph, sels=[]) %}<div class="toolbar" data-tb="{{ id }}"><input type="search" data-q placeholder="{{ ph }}" aria-label="{{ ph }}">{% for key, label, opts in sels %}<select data-key="{{ key }}" data-label="{{ label }}" aria-label="{{ label }}"{% if opts is none %} data-dyn{% endif %}><option value="all">{{ label }}</option>{% for o in (opts or []) %}<option value="{{ o }}">{{ o|replace('_',' ')|capitalize }}</option>{% endfor %}</select>{% endfor %}</div>{% endmacro %}
+{% macro table(id, cols, msg) %}<div class="tw"><table class="wide"><thead><tr>{% for c in cols %}<th scope="col">{{ c }}</th>{% endfor %}</tr></thead><tbody data-body="{{ id }}"></tbody></table></div><p class="state" data-nodata="{{ id }}" data-def="{{ msg }}">{{ msg }}</p>{% endmacro %}
+{% macro detail(id, title, hint, caps, btns=[]) %}<aside class="panel" data-detail="{{ id }}"><h3>{{ title }}</h3><div data-dbody><p class="state">{{ hint }}</p></div><h4>Available after integration</h4>{{ ul('caps', caps) }}{% if btns %}<div class="actions">{% for b in btns %}<button class="btn" disabled title="Needs a backend operation with authorization">{{ b }}</button>{% endfor %}</div>{% endif %}</aside>{% endmacro %}
+
+<section class="page" id="docker" data-view="docker">
+  {{ head('Docker containers', 'Inspect container state, health and resource use through the Docker Engine API.', 'docker', 'DOCKER NOT CONNECTED') }}
+  {{ stats([('d-total','Total containers'),('d-run','Running'),('d-stop','Stopped'),('d-bad','Unhealthy')]) }}
+  <div class="split">
+    <div class="stack">
+      <article class="panel"><h3>Container workspace</h3>
+        {{ toolbar('docker', 'Search name, image or ID', [('_b','All states',['running','stopped','unhealthy'])]) }}
+        {{ table('docker', ['Name','Image','ID','State','Health','Uptime','CPU','Memory'], 'Docker is not connected, so no containers are listed and the counts above show N/A on purpose.') }}
+      </article>
+      <article class="panel"><h3>Connection path <small>informational diagram, not live Docker data</small></h3>
+        {{ flow('docker', [('This page','◐','browser'),('Flask backend','◈','flask'),('Docker Engine API','▣','docker'),('Containers','▤','docker')]) }}
+        {{ steps([('Run the Docker Engine','Start Docker Desktop or the Docker service on the host.'),('Add a read-only Flask route','Use the Docker SDK in the backend to list containers. Never expose the Docker socket to the browser.'),('Protect operations','Require authorization before any start, stop or restart route exists.'),('Point JEMI at it','Set endpoints.docker in static/js/jemi.js to the new route.')]) }}
+      </article>
+    </div>
+    {{ detail('docker', 'Container details', 'Select a container to see configuration, ports, logs, health checks and resource usage.', ['Container configuration and image','Published ports','Recent logs','Health-check results','CPU and memory usage'], ['Inspect','View logs','Start','Stop','Restart']) }}
+  </div>
+</section>
+
+<section class="page" id="deploy" data-view="deploy">
+  {{ head('Deployment center', 'Release history, build results and the path from commit to a healthy deployment.', 'deployments', 'NO DEPLOYMENT SOURCE') }}
+  {{ stats([('p-latest','Latest deployment'),('p-build','Latest build'),('p-ok','Successful'),('p-fail','Failed'),('p-env','Environment'),('p-rel','Latest release')]) }}
+  <article class="panel"><h3>Release pipeline <span class="tag" data-integ="deployments" data-off="NOT CONFIGURED">NOT CONFIGURED</span></h3>
+    {{ flow('deploy', [('Source','◇','source'),('Test','✔','test'),('Build','⚙','build'),('Package','▣','package'),('Deploy','▲','deploy'),('Health check','♥','health')]) }}
+    <small class="muted">Stages light up only when a deployment record includes a stages result. Nothing here is simulated.</small></article>
+  <div class="split">
+    <article class="panel"><h3>Deployment history</h3>
+      {{ toolbar('deployments', 'Search version, branch or commit', [('environment','All environments',none),('deploy_status','All statuses',['success','failed','running'])]) }}
+      {{ table('deployments', ['Version','Branch','Commit','Environment','Build','Deployment','Time','Details'], 'No deployment records yet. Connect a deployment source to build release history.') }}
+    </article>
+    {{ detail('deployments', 'Release details', 'Select a deployment to see its release notes, build output, artifacts and logs.', ['Release notes','Build output','Artifact information','Deployment logs']) }}
+  </div>
+  <article class="panel"><h3>How deployment records will appear</h3>
+    {{ steps([('Push to GitHub','A workflow runs tests and builds on every push to the main branch.'),('Record the release','A final job stores version, branch, commit, environment and result.'),('Serve it as JSON','A Flask route returns those records as a list.'),('Connect JEMI','Set endpoints.deployments in static/js/jemi.js.')]) }}
+  </article>
+</section>
+
+<section class="page" id="incidents" data-view="incidents">
+  {{ head('Incident monitor', 'Detect, investigate and resolve problems with a clear record of what happened.', 'incidents', 'MONITORING NOT CONFIGURED') }}
+  {{ stats([('i-active','Active incidents'),('i-crit','Critical'),('i-warn','Warnings'),('i-res','Resolved')]) }}
+  <div class="cols">
+    <article class="panel"><h3>Incident lifecycle</h3>
+      {{ flow('incident', [('Detection','◉','detect'),('Investigation','⌕','investigate'),('Resolution','✔','resolve')]) }}
+      <small class="muted">Monitoring is not configured, so incident status is unknown. This is not a statement that nothing is wrong.</small></article>
+    <article class="panel"><h3>Local threshold checks <span class="tag">LIVE METRICS · NOT AN INCIDENT SOURCE</span></h3>
+      <ul class="thr">{% for k, l in [('cpu','CPU'),('mem','Memory'),('disk','Disk')] %}<li><span>{{ l }}</span><b data-f="chk-{{ k }}">N/A</b><span class="b" data-chk="{{ k }}">N/A</span></li>{% endfor %}</ul>
+      <small class="muted">Warning at 75% and critical at 90% of current readings from /api/metrics. These are not recorded incidents.</small></article>
+  </div>
+  <div class="split">
+    <article class="panel"><h3>Incident list</h3>
+      {{ toolbar('incidents', 'Search title or service', [('severity','All severities',['critical','warning','info']),('status','All statuses',['active','resolved'])]) }}
+      {{ table('incidents', ['Severity','Title','Service','Status','Detected','Duration','Details'], 'No incident source is connected, so there is nothing to list yet.') }}
+    </article>
+    {{ detail('incidents', 'Incident details', 'Select an incident to see its summary, timeline, affected services and notes.', ['Incident summary','Timeline of recorded events','Affected services','Diagnostics and logs','Resolution notes']) }}
+  </div>
+  <article class="panel"><h3>Connect monitoring alerts</h3>
+    {{ ul('checks', ['Choose an alert source such as Prometheus Alertmanager, Grafana or Uptime Kuma','Add a Flask route that returns incidents with severity, service, status and detection time','Keep credentials on the server and out of the browser','Set endpoints.incidents in static/js/jemi.js']) }}</article>
+</section>
+
+<section class="page" id="pipeline" data-view="pipeline">
+  {{ head('GitHub Actions', 'Workflow runs, results and the build lifecycle for this repository.', 'github', 'GITHUB NOT CONNECTED') }}
+  {{ stats([('g-repo','Repository'),('g-branch','Branch'),('g-latest','Latest run'),('g-ok','Last successful run'),('g-fail','Failed runs'),('g-conn','Connection')]) }}
+  <article class="panel"><h3>Build lifecycle</h3>
+    {{ flow('github', [('Checkout','↓','checkout'),('Install','⬇','install'),('Test','✔','test'),('Build','⚙','build'),('Report','☰','report')]) }}
+    <small class="muted">Stage results appear only when the latest run reports them.</small></article>
+  <article class="panel"><h3>Workflow runs</h3>
+    {{ toolbar('github', 'Search workflow, branch or commit', [('status','All statuses',['success','failure','in_progress']),('branch','All branches',none)]) }}
+    {{ table('github', ['Workflow','Branch','Commit','Event','Status','Started','Duration','Run'], 'GitHub Actions is not connected, so no runs are shown.') }}
+  </article>
+  <div class="cols">
+    <article class="panel"><h3>Set up the workflow</h3>
+      {{ steps([('Create the file','Add .github/workflows/ci.yml to the repository.'),('Choose triggers','Run on pushes to main and on pull requests.'),('Run the checks','Install dependencies, run the tests, then build.'),('Surface results','Serve run data from Flask and set endpoints.github. Keep tokens on the server.')]) }}</article>
+    <article class="panel"><h3>Example workflow <span class="tag">GUIDANCE ONLY</span></h3>
+      <pre id="yaml">name: JEMI CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+      - run: pip install -r requirements.txt
+      - run: pytest        # add tests/ first
+      - run: docker build -t jemi:ci .   # needs a Dockerfile</pre>
+      <button class="btn" data-copy="#yaml">Copy workflow</button></article>
+  </div>
+</section>
+
+<section class="page" id="settings" data-view="settings">
+  {{ head('Settings', 'Preferences are stored in this browser only. No secrets are saved.') }}
+  <div class="cols">
+    <article class="panel"><h3>Appearance</h3>
+      <div class="pv" aria-hidden="true"><span class="pr"></span><div><b>Theme preview</b><i class="bar2"></i></div></div>
+      <div class="opt"><span>Accent</span><div class="seg" role="group" aria-label="Accent colour">{% for v in ['violet','blue','cyan'] %}<button class="btn" data-pref="accent" data-val="{{ v }}">{{ v|capitalize }}</button>{% endfor %}</div></div>
+      <div class="opt"><span>Density</span><div class="seg" role="group" aria-label="Density">{% for v in ['comfortable','compact'] %}<button class="btn" data-pref="density" data-val="{{ v }}">{{ v|capitalize }}</button>{% endfor %}</div></div>
+      <div class="opt"><span>Reduce motion</span><button class="switch" role="switch" aria-label="Reduce motion" aria-checked="false" data-pref="motion"></button></div></article>
+    <article class="panel"><h3>Monitoring</h3>
+      <div class="opt"><span>Auto refresh</span><button class="switch" role="switch" aria-label="Auto refresh" aria-checked="true" data-pref="auto"></button></div>
+      <div class="opt"><span>Polling interval</span><select data-pref="interval" aria-label="Polling interval"><option value="5">5 seconds</option><option value="10">10 seconds</option><option value="30">30 seconds</option></select></div>
+      <div class="opt"><span>Chart history</span><select data-pref="hist" aria-label="Chart history length"><option value="30">30 samples</option><option value="60">60 samples</option><option value="120">120 samples</option></select></div>
+      <div class="opt"><span>Last successful refresh</span><b data-f="dlast">N/A</b></div>
+      <div class="actions"><button class="btn" data-act="refresh">Refresh now</button></div></article>
+    <article class="panel"><h3>Connection status</h3>
+      <ul class="conns">{% for k, l in [('backend','Flask backend'),('metrics','System metrics endpoint'),('docker','Docker integration'),('github','GitHub Actions integration'),('deployments','Deployment data source'),('incidents','Incident data source')] %}<li><span>{{ l }}</span><b class="b" data-cs="{{ k }}">Unknown</b></li>{% endfor %}</ul>
+      <small class="muted">Status comes from real requests. An integration with no endpoint set is shown as Not configured.</small></article>
+    <article class="panel"><h3>Diagnostics</h3>
+      <dl class="info"><div><dt>Frontend version</dt><dd data-f="dver">N/A</dd></div><div><dt>Refresh interval</dt><dd data-f="dint">N/A</dd></div><div><dt>Last metrics update</dt><dd data-f="dlast">N/A</dd></div><div><dt>Browser</dt><dd class="ua" data-f="dua">N/A</dd></div></dl>
+      <div class="actions"><button class="btn" data-act="refresh">Refresh connection checks</button> <button class="btn" data-copy="diag">Copy diagnostics</button></div>
+      <small class="muted">The summary leaves out secrets, cookies and stored data.</small></article>
+    <article class="panel wide2"><h3>About JEMI</h3>
+      <p>JEMI DevOps Control Center is a Flask-backed monitoring dashboard built for an ISE-2 DevOps and Kubernetes practical. It shows real host metrics today and has honest placeholders for Docker, CI/CD and incidents until they are connected.</p>
+      {{ ul('caps', ['Environment: development','Backend: Python 3.10, Flask, psutil','Frontend: HTML, CSS and vanilla JavaScript, no dependencies','Live endpoints: /api/health and /api/metrics']) }}</article>
+  </div>
+</section>
+</div>
+</div>
+<script src="{{ url_for('static', filename='js/jemi.js') }}?v=3"></script>
+</body>
+</html>
