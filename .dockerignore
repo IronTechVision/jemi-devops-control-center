@@ -1,0 +1,32 @@
+# Git and CI/CD
+.git/
+.gitignore
+.github/
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Python cache and bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Testing and coverage
+tests/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Secrets and environment configs
+.env
+.env.*
+
+# Media, documentation, and IDE metadata
+screenshots/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.log

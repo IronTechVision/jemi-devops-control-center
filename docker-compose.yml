@@ -1,0 +1,25 @@
+services:
+  jemi-control-center:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jemi-control-center:latest
+    container_name: jemi-control-center
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=5000
+      - FLASK_DEBUG=false
+      - METRICS_DISK_PATH=/
+    healthcheck:
+      test:
+        - "CMD"
+        - "python"
+        - "-c"
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/health', timeout=3)"
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s

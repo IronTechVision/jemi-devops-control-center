@@ -6,7 +6,7 @@
   const VERSION = '0.2.0';
   // Set a URL to switch an integration on. Each must return a JSON array (see the setup panels). null = not configured.
   const CFG = Object.assign({ metrics: '/api/metrics', health: '/api/health', interval: 5000, timeout: 4000, cap: 120, auto: true,
-    endpoints: { docker: null, deployments: null, incidents: null, github: null } }, window.JEMI_CONFIG || {});
+    endpoints: { docker: null, deployments: null, incidents: '/api/incidents', github: null } }, window.JEMI_CONFIG || {});
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const NA = 'N/A';
