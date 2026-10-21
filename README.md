@@ -350,22 +350,115 @@ docker-compose down
 
 ---
 
-## 14. ISE–2 Submission Evidence
+## 14. ISE–2 Evidence
 
-The following genuine evidence captures have been collected directly from the running application, live terminal command executions, and the GitHub repository:
+This section documents verified project evidence gathered from the live running application, REST APIs, automated testing suite, GitHub Actions CI/CD pipeline, and development milestones.
 
-| Evidence File | What It Demonstrates | Verification Status |
-| :--- | :--- | :--- |
-| [`screenshots/01_dashboard_overview.png`](screenshots/01_dashboard_overview.png) | Complete JEMI Futuristic HUD Control Center homepage with live gauges, system specs, and application health | ✅ Verified Live |
-| [`screenshots/02_system_monitoring.png`](screenshots/02_system_monitoring.png) | System Monitoring view (`#monitoring`) with real-time CPU/RAM canvas trend history and network throughput rates | ✅ Verified Live |
-| [`screenshots/03_incident_monitor.png`](screenshots/03_incident_monitor.png) | Incident Monitor view (`#incidents`) showing connected sentinel engine, threshold checks, and incident logs | ✅ Verified Live |
-| [`screenshots/04_health_api.png`](screenshots/04_health_api.png) | Raw REST response from `/api/health` confirming service signature, status OK, and UTC timestamp | ✅ Verified Live |
-| [`screenshots/05_metrics_api.png`](screenshots/05_metrics_api.png) | Raw REST response from `/api/metrics` showing real hardware telemetry (CPU, RAM, Disk, Network, Platform, Host) | ✅ Verified Live |
-| [`screenshots/06_incident_api.png`](screenshots/06_incident_api.png) | Raw REST response from `/api/incidents` showing rule-evaluated telemetry and normal operational status | ✅ Verified Live |
-| [`screenshots/07_demo_alert.png`](screenshots/07_demo_alert.png) | Simulated critical incident response via `?simulate=cpu_critical` demonstrating transparent alert labeling | ✅ Verified Live |
-| [`screenshots/08_test_results.png`](screenshots/08_test_results.png) | Terminal execution of `python -m pytest -v` with all 10 unit/integration tests passing (100% pass rate) | ✅ Verified Live |
-| [`screenshots/09_git_commit_history.png`](screenshots/09_git_commit_history.png) | Terminal verification of `git log --oneline -10`, `git status`, and `git diff --stat` showing clean tree | ✅ Verified Live |
-| [`screenshots/10_github_actions.png`](screenshots/10_github_actions.png) | Live GitHub Actions workflow run `39582493325` on commit `006f0ff` showing green checkmark and success on Ubuntu | ✅ Verified Live |
+---
+
+### Application UI
+
+### 1. Dashboard Overview
+
+![Dashboard Overview](screenshots/01_dashboard_overview.png)
+
+**What it demonstrates:** The live JEMI DevOps Control Center dashboard, including system metrics and application health.
+
+### 2. System Monitoring
+
+![System Monitoring](screenshots/02_system_monitoring.png)
+
+**What it demonstrates:** Real-time host telemetry charts tracking CPU and memory utilization trends alongside live network throughput counters.
+
+### 3. Incident Monitor
+
+![Incident Monitor](screenshots/03_incident_monitor.png)
+
+**What it demonstrates:** The active incident sentinel monitor displaying real-time threshold evaluations and system operational state.
+
+---
+
+### API Evidence
+
+### 4. Health API
+
+![Health API](screenshots/04_health_api.png)
+
+**What it demonstrates:** Raw JSON response from `/api/health` verifying service availability, operational status, and UTC timestamp.
+
+### 5. Metrics API
+
+![Metrics API](screenshots/05_metrics_api.png)
+
+**What it demonstrates:** Raw JSON telemetry payload from `/api/metrics` exposing real-time CPU, RAM, disk, network, and host details.
+
+### 6. Incident API
+
+![Incident API](screenshots/06_incident_api.png)
+
+**What it demonstrates:** Rule-evaluated incident telemetry returned by `/api/incidents` confirming normal baseline operational status.
+
+### 7. Demo Alert Simulation
+
+![Demo Alert Simulation](screenshots/07_demo_alert.png)
+
+**What it demonstrates:** Simulated critical incident response via `?simulate=cpu_critical` demonstrating transparent alert labeling and incident response handling.
+
+---
+
+### Testing and GitHub Actions
+
+### 8. Automated Test Results
+
+![Automated Test Results](screenshots/08_test_results.png)
+
+**What it demonstrates:** Terminal execution of `python -m pytest -v` with all 10 unit and integration tests passing successfully (100% pass rate).
+
+### 9. Git Commit History
+
+![Git Commit History](screenshots/09_git_commit_history.png)
+
+**What it demonstrates:** Terminal audit of repository commit history, clean Git working tree, and synchronized branch status.
+
+### 10. GitHub Actions CI/CD
+
+![GitHub Actions CI/CD](screenshots/10_github_actions.png)
+
+**What it demonstrates:** Automated GitHub Actions workflow run `39582493325` on commit `006f0ff` executing and passing on Ubuntu Linux.
+
+---
+
+### Historical Milestones (Uploaded Evidence)
+
+### 11. Initial Git Commit
+
+![Initial Git Commit](screenshots/initial_git_commit.png)
+
+**What it demonstrates:** Initial repository commit (`6cd7723`), author attribution (`Aryan Kamble`), and initial tracking of project assets. *(Scope: Local Git initialization; does not reflect subsequent feature development).*
+
+### 12. Original Three Unit Tests
+
+![Original Three Unit Tests](screenshots/original_three_unit_tests.png)
+
+**What it demonstrates:** Execution and pass of the original baseline 3-test suite in 0.77s under both system and `.venv` Python runtimes. *(Scope: Reflects the original 3 unit tests prior to the expanded 10-test suite).*
+
+### 13. GitHub Actions Workflow Configuration Setup
+
+![GitHub Actions Workflow Configuration Setup](screenshots/github_actions_workflow_setup.png)
+
+**What it demonstrates:** Verification of repository directory structure and workflow file configuration (`.github/workflows/tests.yml`). *(Scope: Documents local directory setup; does not confirm remote execution status).*
+
+### 14. GitHub Repository Page
+
+![GitHub Repository Page](screenshots/github_repository_page.png)
+
+**What it demonstrates:** GitHub web interface for `IronTechVision/jemi-devops-control-center` prior to pushing commits. *(Scope: Confirms remote repository creation; does not demonstrate workflow runs or passing CI status).*
+
+### 15. Git Hygiene and Tracking Rules
+
+![Git Hygiene and Tracking Rules](screenshots/git_remote_sync_evidence.png)
+
+**What it demonstrates:** Verification of `.gitignore` patterns ensuring `.venv/`, caches, and environment secrets remain untracked. *(Scope: Confirms repository hygiene rules were established prior to staging project files).*
 
 ---
 
