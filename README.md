@@ -1,6 +1,6 @@
 # JEMI DevOps Control Center
 
-> **ISE–2 DevOps Laboratory Project**  
+> **ISE–2 DevOps Project**  
 > *Real-time System Observability, Rule-Based Incident Detection, and Automated CI/CD Pipeline*
 
 ---
