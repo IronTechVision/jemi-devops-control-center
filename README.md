@@ -350,40 +350,22 @@ docker-compose down
 
 ---
 
-## 14. ISE–2 Submission Evidence Checklist
+## 14. ISE–2 Submission Evidence
 
-Capture and include the following screenshots in the [`screenshots/`](screenshots/) directory for your laboratory submission report:
+The following genuine evidence captures have been collected directly from the running application, live terminal command executions, and the GitHub repository:
 
-- [ ] **Evidence 1: JEMI Dashboard in Browser**
-  - Launch `python app.py` and open `http://127.0.0.1:5000/`.
-  - Capture the futuristic HUD showing live CPU, Memory, Disk gauge rings, and animated core.
-  - File name recommendation: `screenshots/01_dashboard_overview.png`.
-- [ ] **Evidence 2: Real System Metrics & Canvas Charts**
-  - Navigate to `#monitoring`.
-  - Capture real-time CPU and Memory utilization canvas history graphs.
-  - File name recommendation: `screenshots/02_system_monitoring_charts.png`.
-- [ ] **Evidence 3: Incident Monitor & Live Alert Inspection**
-  - Navigate to `#incidents`.
-  - Capture the incident list table showing real rule-evaluated telemetry and details panel.
-  - File name recommendation: `screenshots/03_incident_monitor.png`.
-- [ ] **Evidence 4: REST API JSON Responses**
-  - In a browser tab or Postman, capture responses from:
-    - `/api/health`
-    - `/api/metrics`
-    - `/api/incidents`
-  - File name recommendation: `screenshots/04_api_responses.png`.
-- [ ] **Evidence 5: Passing Automated Tests**
-  - Run `python -m pytest -v` in PowerShell.
-  - Capture the terminal output showing 10 passed tests in green.
-  - File name recommendation: `screenshots/05_pytest_results.png`.
-- [ ] **Evidence 6: GitHub Actions Workflow Pass**
-  - Push changes to GitHub and navigate to the **Actions** tab on your repository.
-  - Capture the green checkmark for the **JEMI CI** workflow run.
-  - File name recommendation: `screenshots/06_github_actions_ci.png`.
-- [ ] **Evidence 7: Git Commit History**
-  - Run `git log --oneline -n 6` in terminal.
-  - Capture clean commit logs showing structured project progression.
-  - File name recommendation: `screenshots/07_git_commit_history.png`.
+| Evidence File | What It Demonstrates | Verification Status |
+| :--- | :--- | :--- |
+| [`screenshots/01_dashboard_overview.png`](screenshots/01_dashboard_overview.png) | Complete JEMI Futuristic HUD Control Center homepage with live gauges, system specs, and application health | ✅ Verified Live |
+| [`screenshots/02_system_monitoring.png`](screenshots/02_system_monitoring.png) | System Monitoring view (`#monitoring`) with real-time CPU/RAM canvas trend history and network throughput rates | ✅ Verified Live |
+| [`screenshots/03_incident_monitor.png`](screenshots/03_incident_monitor.png) | Incident Monitor view (`#incidents`) showing connected sentinel engine, threshold checks, and incident logs | ✅ Verified Live |
+| [`screenshots/04_health_api.png`](screenshots/04_health_api.png) | Raw REST response from `/api/health` confirming service signature, status OK, and UTC timestamp | ✅ Verified Live |
+| [`screenshots/05_metrics_api.png`](screenshots/05_metrics_api.png) | Raw REST response from `/api/metrics` showing real hardware telemetry (CPU, RAM, Disk, Network, Platform, Host) | ✅ Verified Live |
+| [`screenshots/06_incident_api.png`](screenshots/06_incident_api.png) | Raw REST response from `/api/incidents` showing rule-evaluated telemetry and normal operational status | ✅ Verified Live |
+| [`screenshots/07_demo_alert.png`](screenshots/07_demo_alert.png) | Simulated critical incident response via `?simulate=cpu_critical` demonstrating transparent alert labeling | ✅ Verified Live |
+| [`screenshots/08_test_results.png`](screenshots/08_test_results.png) | Terminal execution of `python -m pytest -v` with all 10 unit/integration tests passing (100% pass rate) | ✅ Verified Live |
+| [`screenshots/09_git_commit_history.png`](screenshots/09_git_commit_history.png) | Terminal verification of `git log --oneline -10`, `git status`, and `git diff --stat` showing clean tree | ✅ Verified Live |
+| [`screenshots/10_github_actions.png`](screenshots/10_github_actions.png) | Live GitHub Actions workflow run `39582493325` on commit `006f0ff` showing green checkmark and success on Ubuntu | ✅ Verified Live |
 
 ---
 
