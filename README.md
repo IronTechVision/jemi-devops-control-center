@@ -625,17 +625,28 @@ This visual gallery presents verified evidence captures from the running applica
 
 ---
 
+
 ### K. Jenkins CI Server & Pipeline Suite
 
-[![Jenkins DevOps Control Center Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)](screenshots/16_jenkins_pipeline_dashboard.png)
+[![JEMI Jenkins CI Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)](screenshots/16_jenkins_pipeline_dashboard.png)
 
-**What it demonstrates:** Live Jenkins continuous integration dashboard on `http://localhost:8080/` managing the complete **JEMI DevOps Control Center** CI/CD pipeline ecosystem (`JEMI-CI`, `JEMI-Deploy`, `JEMI-Test`, `JEMI-Docker-Build`, `JEMI-Nightly`, and `JEMI-Main-Pipeline`) executing automated test suites, Docker image compilation, and deployment automation.
+**What it demonstrates:** The Jenkins dashboard for the JEMI DevOps Control Center, showing configured CI/CD jobs, build status, and pipeline activity. This screenshot should reflect the actual Jenkins instance and jobs that have been configured.
 
-[🔍 View Full-Size Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
+[🔍 View Full-Size Jenkins Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
 
-[![Jenkins Login Screen](screenshots/jenkins_login.png)](screenshots/jenkins_login.png)
+#### Jenkins Pipeline Build Results
 
-**What it demonstrates:** Verified local Jenkins Windows Service active and authenticated on `http://localhost:8080/login`, ingesting and running declarative [`Jenkinsfile`](Jenkinsfile) workflows.
+[![JEMI Jenkins Pipeline Build Results](screenshots/17_jenkins_build_results.png)](screenshots/17_jenkins_build_results.png)
+
+**What it demonstrates:** The actual Jenkins pipeline execution, including checkout, dependency installation, automated tests, and Docker image build stages where configured.
+
+[🔍 View Full-Size Jenkins Build Results](screenshots/17_jenkins_build_results.png)
+
+#### Jenkins Test Results
+
+[![JEMI Jenkins Test Results](screenshots/18_jenkins_test_results.png)](screenshots/18_jenkins_test_results.png)
+
+**What it demonstrates:** Test results published by Jenkins, showing the actual number of passed, failed, or skipped tests.
 
 
 
