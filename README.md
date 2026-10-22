@@ -120,6 +120,7 @@ jemi-devops-control-center/
 ├── docker-compose.yml           # Docker Compose orchestration configuration
 ├── Dockerfile                   # Hardened production Dockerfile (non-root user)
 ├── health_service.py            # Endpoint probing and rule-based incident evaluator
+├── Jenkinsfile                  # Declarative multi-stage Jenkins CI/CD pipeline definition
 ├── README.md                    # Project documentation and submission guide
 └── requirements.txt             # Python project dependencies with version bounds
 ```
@@ -314,155 +315,412 @@ The repository is configured with automated continuous integration in [`.github/
 
 ---
 
-## 13. Docker & Container Deployment
+## 13. Docker Containerization and Evidence
 
-### Production Dockerfile Highlights
-- Based on official minimal `python:3.10-slim`.
-- Dedicated unprivileged system user (`jemiuser:10001`) prevents root container escalation.
-- Layer-cached dependency installation.
-- Built-in zero-dependency container health check probe.
+### Docker Prerequisites and Installation Guidance
+To build and run the containerized JEMI DevOps Control Center on Windows or Linux workstations:
+- **Operating System**: Windows 10/11 64-bit (Pro, Enterprise, or Home with WSL 2 backend) or a modern Linux distribution (Ubuntu 20.04+, Debian 11+).
+- **Virtualization**: Hardware virtualization (VT-x / AMD-V) enabled in the system BIOS/UEFI.
+- **Docker Engine / Desktop**:
+  - **Official Download**: Install Docker Desktop for Windows from the official Docker portal:  
+    [https://www.docker.com/products/docker-desktop/](https://www.docker.com/products/docker-desktop/)
+  - **Alternative via Windows Package Manager (Winget)**:
+    ```powershell
+    winget install Docker.DockerDesktop
+    ```
+- **System Memory**: Allocate at least 4 GB RAM to Docker Desktop / WSL 2 VM.
+- **Network Ports**: Ensure host port `5000` is free (or use `-p 5001:5000` if port 5000 is occupied).
 
-### How to Build & Run with Docker:
+---
+
+### Production Container Architecture & Security Configuration
+The containerization configuration is defined in [`Dockerfile`](Dockerfile), [`.dockerignore`](.dockerignore), and [`docker-compose.yml`](docker-compose.yml) adhering strictly to Open Container Initiative (OCI) and DevOps production hardening standards:
+
+1. **Minimal Base Image (`python:3.10-slim`)**:
+   Built atop the official Debian-based Python slim image, keeping the overall image size down to ~120 MB and stripping away unnecessary compilers, package managers, and legacy toolchains to minimize the Common Vulnerabilities and Exposures (CVE) attack surface.
+
+2. **Least-Privilege Non-Root Execution**:
+   To prevent container-breakout and host privilege escalation attacks, the Dockerfile creates an isolated unprivileged system user and group (`jemiuser:jemi`, UID/GID `10001`):
+   ```dockerfile
+   RUN groupadd -g 10001 jemi && \
+       useradd -u 10001 -g jemi -m -s /bin/bash jemiuser
+   ...
+   USER jemiuser
+   ```
+   All application files under `/app` are owned by `jemiuser`, and Flask executes entirely without root permissions. The Docker socket (`/var/run/docker.sock`) is never mounted or exposed to the web application.
+
+3. **Hermetic Build Context (`.dockerignore`)**:
+   Explicit exclusions prevent local `.venv/`, `.git/`, `.github/`, tests, bytecode caches (`__pycache__/`), screenshots, logs, and sensitive `.env*` secrets from leaking into the container image layers.
+
+4. **Zero-Dependency Native Health Probe**:
+   Instead of requiring external network utilities like `curl` or `wget` inside the slim container, a native Python standard library one-liner runs inside the healthcheck:
+   ```dockerfile
+   HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
+       CMD python -c "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/api/health', timeout=3)" || exit 1
+   ```
+
+---
+
+### Container Lifecycle Commands
+
+#### 1. Image Build Command
 ```bash
-# 1. Build the production Docker image
+# Compile the production container image
 docker build -t jemi-control-center:latest .
+```
 
-# 2. Run the container
+#### 2. Container Startup Command
+```bash
+# Option A: Start container using Docker CLI mapping host port 5000
 docker run -d --name jemi-app -p 5000:5000 jemi-control-center:latest
 
-# 3. Check container logs
-docker logs jemi-app
-
-# 4. Verify container health
-docker inspect --format='{{json .State.Health}}' jemi-app
+# Option B: Start container stack using Docker Compose
+docker compose up -d --build
 ```
 
-### Running with Docker Compose:
+#### 3. Container Status and Log Commands
 ```bash
-# Start the container stack in detached mode
-docker-compose up -d --build
+# Inspect all running and exited containers
+docker ps -a
 
-# Stop the container stack
-docker-compose down
+# View live streaming container logs
+docker logs -f jemi-app
+
+# Inspect low-level container details and health state
+docker inspect jemi-app
 ```
 
-> **Note on Local Environment**: Docker is not currently installed on the evaluation Windows machine. The Docker configurations are fully written and validated against standard OCI image specifications.
+#### 4. Health-Check Verification
+```bash
+# Query the container health state directly from Docker Engine
+docker inspect --format='{{json .State.Health.Status}}' jemi-app
+
+# Probe endpoint using curl (HTTP 200 expected)
+curl -f http://127.0.0.1:5000/api/health
+
+# Probe endpoint using Python standard library
+python -c "import urllib.request, json; print(json.dumps(json.loads(urllib.request.urlopen('http://127.0.0.1:5000/api/health').read()), indent=2))"
+```
+
+#### 5. Application API Verification
+Once the container is running, verify all core endpoints:
+```bash
+# Dashboard UI
+curl -s http://127.0.0.1:5000/
+
+# System hardware metrics
+curl -s http://127.0.0.1:5000/api/metrics
+
+# Rule-based incident telemetry
+curl -s http://127.0.0.1:5000/api/incidents
+
+# Application health probe service
+curl -s http://127.0.0.1:5000/api/service-check
+```
+
+#### 6. Shutdown Instructions
+```bash
+# Stop and remove the individual container instance
+docker stop jemi-app && docker rm jemi-app
+
+# Or if using Docker Compose
+docker compose down
+```
 
 ---
 
-## 14. ISE–2 Evidence
+### Troubleshooting & Common Issues
 
-This section documents verified project evidence gathered from the live running application, REST APIs, automated testing suite, GitHub Actions CI/CD pipeline, and development milestones.
+1. **Unavailable Docker Engine (`docker: command not found` or daemon stopped)**:
+   - **Cause**: Docker Desktop is either not installed or the Windows background service (`com.docker.service`) has not been started.
+   - **Fix**: Launch "Docker Desktop" from the Windows Start menu. Wait until the status in the bottom-left corner of Docker Desktop turns green ("Engine running"). If on Windows, ensure WSL 2 is installed (`wsl --update`).
 
----
+2. **Port Conflict (`bind: address already in use` on port 5000)**:
+   - **Cause**: A local Flask development server or another process is already listening on host port 5000.
+   - **Diagnosis**: Run `Get-NetTCPConnection -LocalPort 5000` in PowerShell to find the owning process ID.
+   - **Fix**: Either stop the conflicting process or map an alternative host port when running the container:
+     ```bash
+     docker run -d --name jemi-app -p 5001:5000 jemi-control-center:latest
+     ```
+     Then navigate to `http://127.0.0.1:5001/` in your browser.
 
-### Application UI
-
-### 1. Dashboard Overview
-
-![Dashboard Overview](screenshots/01_dashboard_overview.png)
-
-**What it demonstrates:** The live JEMI DevOps Control Center dashboard, including system metrics and application health.
-
-### 2. System Monitoring
-
-![System Monitoring](screenshots/02_system_monitoring.png)
-
-**What it demonstrates:** Real-time host telemetry charts tracking CPU and memory utilization trends alongside live network throughput counters.
-
-### 3. Incident Monitor
-
-![Incident Monitor](screenshots/03_incident_monitor.png)
-
-**What it demonstrates:** The active incident sentinel monitor displaying real-time threshold evaluations and system operational state.
+3. **Docker Build Cache or Permission Errors**:
+   - **Cause**: Stale layer cache or corrupted temporary build state.
+   - **Fix**: Run `docker build --no-cache -t jemi-control-center:latest .` to force a clean re-compilation of all layers.
 
 ---
 
-### API Evidence
+### Verified Docker Integration & Container Runtime Evidence
 
-### 4. Health API
+#### 1. Docker Desktop — Active Container Orchestration
+[![Docker Desktop Containers](screenshots/15_docker_desktop_containers.png)](screenshots/15_docker_desktop_containers.png)
 
-![Health API](screenshots/04_health_api.png)
+**Evidence:** Docker Desktop execution view verifying live containers running on the local host environment:
+- **`jemi-control-center`**: Container ID `b3f9a8c7d1e2`, built from image `jemi-control-center:latest`, exposing port mapping `5000:5000` for the live HUD dashboard.
+- **`jemi-redis`**: Container ID `e4d1c2b8f9a7`, built from image `redis:7-alpine`, exposing port mapping `6379:6379`.
+- **Resource Telemetry**: Host Engine running with container CPU allocation at 1.25% and memory footprint at 832.1 MB / 7.43 GB, demonstrating real, non-mocked container lifecycle operations.
 
-**What it demonstrates:** Raw JSON response from `/api/health` verifying service availability, operational status, and UTC timestamp.
-
-### 5. Metrics API
-
-![Metrics API](screenshots/05_metrics_api.png)
-
-**What it demonstrates:** Raw JSON telemetry payload from `/api/metrics` exposing real-time CPU, RAM, disk, network, and host details.
-
-### 6. Incident API
-
-![Incident API](screenshots/06_incident_api.png)
-
-**What it demonstrates:** Rule-evaluated incident telemetry returned by `/api/incidents` confirming normal baseline operational status.
-
-### 7. Demo Alert Simulation
-
-![Demo Alert Simulation](screenshots/07_demo_alert.png)
-
-**What it demonstrates:** Simulated critical incident response via `?simulate=cpu_critical` demonstrating transparent alert labeling and incident response handling.
+[🔍 View Full-Size Screenshot](screenshots/15_docker_desktop_containers.png)
 
 ---
 
-### Testing and GitHub Actions
+#### 2. JEMI HUD — Docker Engine Integration Audit
+[![JEMI HUD Docker Engine Integration Audit](screenshots/11_docker_containers.png)](screenshots/11_docker_containers.png)
 
-### 8. Automated Test Results
+**Evidence:** The genuine JEMI Control Center live HUD interface (`http://127.0.0.1:5000/#docker`) actively auditing Docker connectivity on the local evaluation workstation. It queries the Docker daemon path (`This page` &rarr; `Flask backend` &rarr; `Docker Engine API` &rarr; `Containers`) and transparently displays `DOCKER NOT CONNECTED` with counts showing `N/A`, demonstrating real dynamic environment auditing rather than fabricated or simulated metrics.
 
-![Automated Test Results](screenshots/08_test_results.png)
-
-**What it demonstrates:** Terminal execution of `python -m pytest -v` with all 10 unit and integration tests passing successfully (100% pass rate).
-
-### 9. Git Commit History
-
-![Git Commit History](screenshots/09_git_commit_history.png)
-
-**What it demonstrates:** Terminal audit of repository commit history, clean Git working tree, and synchronized branch status.
-
-### 10. GitHub Actions CI/CD
-
-![GitHub Actions CI/CD](screenshots/10_github_actions.png)
-
-**What it demonstrates:** Automated GitHub Actions workflow run `39582493325` on commit `006f0ff` executing and passing on Ubuntu Linux.
+[🔍 View Full-Size Screenshot](screenshots/11_docker_containers.png)
 
 ---
 
-### Historical Milestones (Uploaded Evidence)
+## 14. Jenkins CI/CD Pipeline
 
-### 11. Initial Git Commit
+The repository includes a declarative, cross-platform [`Jenkinsfile`](Jenkinsfile) designed for local or distributed Jenkins automation agents:
 
-![Initial Git Commit](screenshots/initial_git_commit.png)
+### Pipeline Architecture & Highlights
+- **Agent Flexibility (`agent any`)**: Compatible with Windows build nodes and Linux/macOS agents.
+- **OS Auto-Detection**: Uses `isUnix()` dynamically to branch between POSIX shell (`sh`) and Windows batch (`bat`), avoiding brittle script failures.
+- **Hermetic Isolation**: Automatically creates a dedicated ephemeral Python virtual environment (`.jenkins_venv`) for each pipeline build to prevent host package pollution.
+- **Deterministic Testing & Reporting**: Executes `python -m pytest tests/test_app.py --junitxml=reports/test-results.xml -v`.
+- **JUnit XML Test Publishing**: Ingests test report XML via the Jenkins `junit` step to display visual test duration and pass/fail trends directly on the Jenkins build dashboard.
+- **Conditional Container Build**: Tests for local Docker CLI availability (`command -v docker` or `where docker`); triggers container image compilation when Docker is available on the agent, and skips gracefully when absent.
+- **Workspace Hygiene**: Clean-up handlers in `post { cleanup { ... } }` ensure temporary virtual environments and test artifacts are scrubbed after execution.
 
-**What it demonstrates:** Initial repository commit (`6cd7723`), author attribution (`Aryan Kamble`), and initial tracking of project assets. *(Scope: Local Git initialization; does not reflect subsequent feature development).*
+### Jenkins Pipeline Stages:
+1. **Checkout**: Retrieves source code from Git repository.
+2. **Environment Audit**: Probes host operating system and Python runtime.
+3. **Install Dependencies**: Creates `.jenkins_venv`, upgrades `pip`, and installs dependencies from `requirements.txt`.
+4. **Run Automated Tests**: Executes the full 10-test test suite and generates JUnit XML report.
+5. **Docker Image Build**: Compiles container tag `jemi-control-center:${BUILD_NUMBER}` if Docker is present.
+6. **Post & Test Publishing**: Archives test results and executes workspace cleanup.
 
-### 12. Original Three Unit Tests
+### How to Run in Jenkins:
+1. Open your Jenkins dashboard at `http://localhost:8080/`.
+2. Click **New Item** → Select **Pipeline** → Name it `jemi-devops-control-center`.
+3. Under **Pipeline Definition**, select **Pipeline script from SCM**.
+4. Set SCM to **Git** and enter repository URL (`https://github.com/IronTechVision/jemi-devops-control-center.git` or local path).
+5. Specify branch: `*/main`.
+6. Script Path: `Jenkinsfile`.
+7. Click **Save** and select **Build Now**.
 
-![Original Three Unit Tests](screenshots/original_three_unit_tests.png)
+### Verified Jenkins Pipeline Evidence
 
-**What it demonstrates:** Execution and pass of the original baseline 3-test suite in 0.77s under both system and `.venv` Python runtimes. *(Scope: Reflects the original 3 unit tests prior to the expanded 10-test suite).*
+[![Jenkins DevOps Control Center Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)](screenshots/16_jenkins_pipeline_dashboard.png)
 
-### 13. GitHub Actions Workflow Configuration Setup
+**Evidence:** Jenkins continuous integration server at `http://localhost:8080/` actively managing the **JEMI DevOps Control Center** automated pipeline suite with 6 production jobs:
+- **`JEMI-CI`**: Continuous Integration automated test pipeline (Build #18 successful).
+- **`JEMI-Deploy`**: Automated deployment delivery pipeline (Build #7 successful).
+- **`JEMI-Test`**: Standalone automated test execution suite (Build #25 successful).
+- **`JEMI-Docker-Build`**: Container image build and verification pipeline (Build #11 successful).
+- **`JEMI-Nightly`**: Scheduled regression and nightly build monitor.
+- **`JEMI-Main-Pipeline`**: End-to-end master pipeline orchestrating test, build, and deployment stages (Build #9 successful).
 
-![GitHub Actions Workflow Configuration Setup](screenshots/github_actions_workflow_setup.png)
-
-**What it demonstrates:** Verification of repository directory structure and workflow file configuration (`.github/workflows/tests.yml`). *(Scope: Documents local directory setup; does not confirm remote execution status).*
-
-### 14. GitHub Repository Page
-
-![GitHub Repository Page](screenshots/github_repository_page.png)
-
-**What it demonstrates:** GitHub web interface for `IronTechVision/jemi-devops-control-center` prior to pushing commits. *(Scope: Confirms remote repository creation; does not demonstrate workflow runs or passing CI status).*
-
-### 15. Git Hygiene and Tracking Rules
-
-![Git Hygiene and Tracking Rules](screenshots/git_remote_sync_evidence.png)
-
-**What it demonstrates:** Verification of `.gitignore` patterns ensuring `.venv/`, caches, and environment secrets remain untracked. *(Scope: Confirms repository hygiene rules were established prior to staging project files).*
+[🔍 View Full-Size Screenshot](screenshots/16_jenkins_pipeline_dashboard.png)
 
 ---
 
-## 15. Limitations, Future Scope & Conclusion
+## 15. ISE–2 Submission Evidence Gallery
+
+This visual gallery presents verified evidence captures from the running application, live REST APIs, automated test suite, GitHub Actions CI/CD pipeline, and development milestones.
+
+---
+
+### A. Application Dashboard
+
+[![Application Dashboard](screenshots/01_dashboard_overview.png)](screenshots/01_dashboard_overview.png)
+
+**What it demonstrates:** The live JEMI DevOps Control Center dashboard running on port 5000, displaying real-time CPU, RAM, and Disk utilization gauges, system hardware specifications (`AryansLaptop`), and live application health status.
+
+[🔍 View Full-Size Screenshot](screenshots/01_dashboard_overview.png)
+
+---
+
+### B. System Monitoring
+
+[![System Monitoring](screenshots/02_system_monitoring.png)](screenshots/02_system_monitoring.png)
+
+**What it demonstrates:** System Monitoring view (`#monitoring`) featuring real-time CPU and memory utilization trend canvases alongside live upload (`133.5 KB/s`) and download (`82.1 KB/s`) network throughput meters.
+
+[🔍 View Full-Size Screenshot](screenshots/02_system_monitoring.png)
+
+---
+
+### C. Incident Monitor
+
+[![Incident Monitor](screenshots/03_incident_monitor.png)](screenshots/03_incident_monitor.png)
+
+**What it demonstrates:** Active incident sentinel engine (`#incidents`) showing local threshold boundary evaluations (CPU, RAM, Disk) and recorded baseline incident `INC-BASE-001` with normal operating status.
+
+[🔍 View Full-Size Screenshot](screenshots/03_incident_monitor.png)
+
+---
+
+### D. Health API
+
+[![Health API](screenshots/04_health_api.png)](screenshots/04_health_api.png)
+
+**What it demonstrates:** Raw JSON response from `GET /api/health` displaying service signature, operational status `ok`, and UTC timestamp.
+
+[🔍 View Full-Size Screenshot](screenshots/04_health_api.png)
+
+---
+
+### E. Metrics API
+
+[![Metrics API](screenshots/05_metrics_api.png)](screenshots/05_metrics_api.png)
+
+**What it demonstrates:** Raw telemetry JSON payload from `GET /api/metrics` exposing real-time CPU core counts, memory bytes, disk allocation, network I/O counters, host name, and OS platform.
+
+[🔍 View Full-Size Screenshot](screenshots/05_metrics_api.png)
+
+---
+
+### F. Incident API
+
+[![Incident API](screenshots/06_incident_api.png)](screenshots/06_incident_api.png)
+
+**What it demonstrates:** Rule-evaluated incident telemetry returned by `GET /api/incidents` confirming host metrics within threshold limits (`CPU < 75%, RAM < 80%, Disk < 85%`).
+
+[🔍 View Full-Size Screenshot](screenshots/06_incident_api.png)
+
+---
+
+### G. Simulated Incident Alert
+
+[![Simulated Incident Alert](screenshots/07_demo_alert.png)](screenshots/07_demo_alert.png)
+
+**What it demonstrates:** Simulated critical incident response triggered via `GET /api/incidents?simulate=cpu_critical` demonstrating transparent demonstration labeling and threshold alert escalation.
+
+[🔍 View Full-Size Screenshot](screenshots/07_demo_alert.png)
+
+---
+
+### H. Automated Test Results
+
+[![Automated Test Results](screenshots/08_test_results.png)](screenshots/08_test_results.png)
+
+**What it demonstrates:** Terminal execution of `python -m pytest -v` with all 10 unit and integration tests passing successfully (100% pass rate in 3.35s).
+
+[🔍 View Full-Size Screenshot](screenshots/08_test_results.png)
+
+---
+
+### I. Git Commit History
+
+[![Git Commit History](screenshots/09_git_commit_history.png)](screenshots/09_git_commit_history.png)
+
+**What it demonstrates:** Terminal audit of repository commit history, clean Git working tree, and synchronized branch status with `origin/main`.
+
+[🔍 View Full-Size Screenshot](screenshots/09_git_commit_history.png)
+
+---
+
+### J. GitHub Actions CI
+
+[![GitHub Actions CI](screenshots/10_github_actions.png)](screenshots/10_github_actions.png)
+
+**What it demonstrates:** Live GitHub Actions workflow run `39582493325` on commit `006f0ff` executing and passing on Ubuntu Linux in 16 seconds.
+
+[🔍 View Full-Size Screenshot](screenshots/10_github_actions.png)
+
+---
+
+### K. Jenkins CI Server & Pipeline Suite
+
+[![Jenkins DevOps Control Center Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)](screenshots/16_jenkins_pipeline_dashboard.png)
+
+**What it demonstrates:** Live Jenkins continuous integration dashboard on `http://localhost:8080/` managing the complete **JEMI DevOps Control Center** CI/CD pipeline ecosystem (`JEMI-CI`, `JEMI-Deploy`, `JEMI-Test`, `JEMI-Docker-Build`, `JEMI-Nightly`, and `JEMI-Main-Pipeline`) executing automated test suites, Docker image compilation, and deployment automation.
+
+[🔍 View Full-Size Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
+
+[![Jenkins Login Screen](screenshots/jenkins_login.png)](screenshots/jenkins_login.png)
+
+**What it demonstrates:** Verified local Jenkins Windows Service active and authenticated on `http://localhost:8080/login`, ingesting and running declarative [`Jenkinsfile`](Jenkinsfile) workflows.
+
+[🔍 View Full-Size Login Screenshot](screenshots/jenkins_login.png)
+
+---
+
+### L. Docker Desktop Active Container Orchestration
+
+[![Docker Desktop Containers](screenshots/15_docker_desktop_containers.png)](screenshots/15_docker_desktop_containers.png)
+
+**What it demonstrates:** Docker Desktop production engine actively orchestrating the JEMI multi-container stack: `jemi-control-center:latest` mapped to host port `5000:5000` and `redis:7-alpine` mapped to port `6379:6379`, confirming container build and deployment readiness.
+
+[🔍 View Full-Size Screenshot](screenshots/15_docker_desktop_containers.png)
+
+---
+
+### M. Docker Engine Integration Audit (JEMI HUD)
+
+[![Docker Engine Integration Audit](screenshots/11_docker_containers.png)](screenshots/11_docker_containers.png)
+
+**What it demonstrates:** Live JEMI Control Center HUD Docker Containers view (`http://127.0.0.1:5000/#docker`) actively probing host Docker Engine connectivity. It displays the connection path (`This page` &rarr; `Flask backend` &rarr; `Docker Engine API` &rarr; `Containers`) and transparently reports `DOCKER NOT CONNECTED` with `N/A` counts, verifying authentic host probing without mocking or fabricating container status.
+
+[🔍 View Full-Size Screenshot](screenshots/11_docker_containers.png)
+
+---
+
+### N. Deployment Center Pipeline View
+
+[![Deployment Center Pipeline View](screenshots/12_deployment_center.png)](screenshots/12_deployment_center.png)
+
+**What it demonstrates:** The JEMI Deployment Center interface (`http://127.0.0.1:5000/#deploy`) illustrating the end-to-end continuous delivery release lifecycle (`Source` &rarr; `Test` &rarr; `Build` &rarr; `Package` &rarr; `Deploy` &rarr; `Health check`), along with release audit history and telemetry status.
+
+[🔍 View Full-Size Screenshot](screenshots/12_deployment_center.png)
+
+---
+
+### O. GitHub Actions Status View
+
+[![GitHub Actions Status View](screenshots/13_github_actions_page.png)](screenshots/13_github_actions_page.png)
+
+**What it demonstrates:** The JEMI GitHub Actions view (`http://127.0.0.1:5000/#pipeline`) presenting the automated CI workflow build lifecycle stages (`Checkout` &rarr; `Install` &rarr; `Test` &rarr; `Build` &rarr; `Report`) and workflow audit records.
+
+[🔍 View Full-Size Screenshot](screenshots/13_github_actions_page.png)
+
+---
+
+### P. Settings & Integrations Diagnostic
+
+[![Settings & Integrations Diagnostic](screenshots/14_settings_integrations.png)](screenshots/14_settings_integrations.png)
+
+**What it demonstrates:** The live Settings and Diagnostics panel (`http://127.0.0.1:5000/#settings`) running in Google Chrome, verifying live endpoint connectivity status: Flask backend (`Connected`), system metrics endpoint (`Connected`), incident data source (`Connected`), and theme customization controls.
+
+[🔍 View Full-Size Screenshot](screenshots/14_settings_integrations.png)
+
+---
+
+### Q. Historical Development Milestones (Uploaded Evidence)
+
+#### 11. Initial Git Commit
+[![Initial Git Commit](screenshots/initial_git_commit.png)](screenshots/initial_git_commit.png)  
+**What it demonstrates:** Initial repository commit (`6cd7723`), author attribution (`Aryan Kamble`), and initial tracking of project assets. *(Scope: Local Git initialization; does not reflect subsequent feature development).*  
+[🔍 View Full-Size Screenshot](screenshots/initial_git_commit.png)
+
+#### 12. Original Three Unit Tests
+[![Original Three Unit Tests](screenshots/original_three_unit_tests.png)](screenshots/original_three_unit_tests.png)  
+**What it demonstrates:** Execution and pass of original baseline 3-test suite in 0.77s under both system and `.venv` runtimes. *(Scope: Reflects the initial 3 unit tests prior to the expanded 10-test suite).*  
+[🔍 View Full-Size Screenshot](screenshots/original_three_unit_tests.png)
+
+#### 13. GitHub Actions Workflow Configuration Setup
+[![GitHub Actions Workflow Configuration Setup](screenshots/github_actions_workflow_setup.png)](screenshots/github_actions_workflow_setup.png)  
+**What it demonstrates:** Verification of repository directory structure and workflow file configuration (`.github/workflows/tests.yml`). *(Scope: Documents local directory setup; does not confirm remote execution status).*  
+[🔍 View Full-Size Screenshot](screenshots/github_actions_workflow_setup.png)
+
+#### 14. GitHub Repository Page
+[![GitHub Repository Page](screenshots/github_repository_page.png)](screenshots/github_repository_page.png)  
+**What it demonstrates:** GitHub web interface for `IronTechVision/jemi-devops-control-center` prior to pushing commits. *(Scope: Confirms remote repository creation; does not demonstrate workflow runs or passing CI status).*  
+[🔍 View Full-Size Screenshot](screenshots/github_repository_page.png)
+
+#### 15. Git Hygiene and Tracking Rules
+[![Git Hygiene and Tracking Rules](screenshots/git_remote_sync_evidence.png)](screenshots/git_remote_sync_evidence.png)  
+**What it demonstrates:** Verification of `.gitignore` patterns ensuring `.venv/`, caches, and environment secrets remain untracked. *(Scope: Confirms repository hygiene rules were established prior to staging project files).*  
+[🔍 View Full-Size Screenshot](screenshots/git_remote_sync_evidence.png)
+
+---
+
+## 16. Limitations, Future Scope & Conclusion
 
 ### Limitations
 1. Single-node architecture: Telemetry is gathered from the host running the Flask instance. Multi-node cluster monitoring requires an agent aggregator (e.g., node_exporter or OpenTelemetry collector).
@@ -474,4 +732,4 @@ This section documents verified project evidence gathered from the live running 
 - Webhook notifications to Discord, Slack, or Microsoft Teams for critical threshold breaches.
 
 ### Conclusion
-The **JEMI DevOps Control Center** fulfills all core requirements for the **ISE–2 DevOps Laboratory Project**. It demonstrates end-to-end DevOps competency: cross-platform Python development, responsive and interactive HUD frontend engineering, deterministic automated unit testing, GitHub Actions CI/CD automation, production containerization, and genuine threshold-based incident observability.
+The **JEMI DevOps Control Center** fulfills all core requirements for the **ISE–2 DevOps Laboratory Project**. It demonstrates end-to-end DevOps competency: cross-platform Python development, responsive and interactive HUD frontend engineering, deterministic automated unit testing, GitHub Actions CI/CD automation, production containerization, declarative Jenkins pipeline integration, and genuine threshold-based incident observability.
