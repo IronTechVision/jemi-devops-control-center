@@ -505,7 +505,7 @@ The repository includes a declarative, cross-platform [`Jenkinsfile`](Jenkinsfil
 
 ### Verified Jenkins Pipeline Evidence
 
-[![Jenkins DevOps Control Center Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)](screenshots/16_jenkins_pipeline_dashboard.png)
+[![Jenkins DevOps Control Center Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)]
 
 **Evidence:** Jenkins continuous integration server at `http://localhost:8080/` actively managing the **JEMI DevOps Control Center** automated pipeline suite with 6 production jobs:
 - **`JEMI-CI`**: Continuous Integration automated test pipeline (Build #18 successful).
