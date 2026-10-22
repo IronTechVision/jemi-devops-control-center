@@ -525,169 +525,183 @@ This visual gallery presents verified evidence captures from the running applica
 
 ---
 
+## 14. ISE–2 Submission Evidence
+
+This section presents visual evidence of the JEMI DevOps Control Center, its APIs, automated testing, Git history, and DevOps integrations.
+
 ### A. Application Dashboard
 
-[![Application Dashboard](screenshots/01_dashboard_overview.png)](screenshots/01_dashboard_overview.png)
+![JEMI Application Dashboard](screenshots/01_dashboard_overview.png)
 
-**What it demonstrates:** The live JEMI DevOps Control Center dashboard running on port 5000, displaying real-time CPU, RAM, and Disk utilization gauges, system hardware specifications (`AryansLaptop`), and live application health status.
-
-[🔍 View Full-Size Screenshot](screenshots/01_dashboard_overview.png)
+**What it demonstrates:** The JEMI dashboard, including system metrics, hardware information, and application health status.
 
 ---
 
 ### B. System Monitoring
 
-[![System Monitoring](screenshots/02_system_monitoring.png)](screenshots/02_system_monitoring.png)
+![JEMI System Monitoring](screenshots/02_system_monitoring.png)
 
-**What it demonstrates:** System Monitoring view (`#monitoring`) featuring real-time CPU and memory utilization trend canvases alongside live upload (`133.5 KB/s`) and download (`82.1 KB/s`) network throughput meters.
-
-[🔍 View Full-Size Screenshot](screenshots/02_system_monitoring.png)
+**What it demonstrates:** CPU and memory trends and network throughput displayed by the System Monitoring page.
 
 ---
 
 ### C. Incident Monitor
 
-[![Incident Monitor](screenshots/03_incident_monitor.png)](screenshots/03_incident_monitor.png)
+![JEMI Incident Monitor](screenshots/03_incident_monitor.png)
 
-**What it demonstrates:** Active incident sentinel engine (`#incidents`) showing local threshold boundary evaluations (CPU, RAM, Disk) and recorded baseline incident `INC-BASE-001` with normal operating status.
-
-[🔍 View Full-Size Screenshot](screenshots/03_incident_monitor.png)
+**What it demonstrates:** The incident-monitoring interface, threshold evaluations, and incident status.
 
 ---
 
 ### D. Health API
 
-[![Health API](screenshots/04_health_api.png)](screenshots/04_health_api.png)
+![JEMI Health API](screenshots/04_health_api.png)
 
-**What it demonstrates:** Raw JSON response from `GET /api/health` displaying service signature, operational status `ok`, and UTC timestamp.
-
-[🔍 View Full-Size Screenshot](screenshots/04_health_api.png)
+**What it demonstrates:** The JSON response from `GET /api/health`.
 
 ---
 
 ### E. Metrics API
 
-[![Metrics API](screenshots/05_metrics_api.png)](screenshots/05_metrics_api.png)
+![JEMI Metrics API](screenshots/05_metrics_api.png)
 
-**What it demonstrates:** Raw telemetry JSON payload from `GET /api/metrics` exposing real-time CPU core counts, memory bytes, disk allocation, network I/O counters, host name, and OS platform.
-
-[🔍 View Full-Size Screenshot](screenshots/05_metrics_api.png)
+**What it demonstrates:** The JSON response from `GET /api/metrics`, including CPU, memory, disk, network, and platform information.
 
 ---
 
 ### F. Incident API
 
-[![Incident API](screenshots/06_incident_api.png)](screenshots/06_incident_api.png)
+![JEMI Incident API](screenshots/06_incident_api.png)
 
-**What it demonstrates:** Rule-evaluated incident telemetry returned by `GET /api/incidents` confirming host metrics within threshold limits (`CPU < 75%, RAM < 80%, Disk < 85%`).
-
-[🔍 View Full-Size Screenshot](screenshots/06_incident_api.png)
+**What it demonstrates:** The response from `GET /api/incidents`, showing the incident evaluations returned by the application.
 
 ---
 
 ### G. Simulated Incident Alert
 
-[![Simulated Incident Alert](screenshots/07_demo_alert.png)](screenshots/07_demo_alert.png)
+![JEMI Simulated Incident Alert](screenshots/07_demo_alert.png)
 
-**What it demonstrates:** Simulated critical incident response triggered via `GET /api/incidents?simulate=cpu_critical` demonstrating transparent demonstration labeling and threshold alert escalation.
-
-[🔍 View Full-Size Screenshot](screenshots/07_demo_alert.png)
+**What it demonstrates:** The demonstration response from `GET /api/incidents?simulate=cpu_critical`. This is simulated evidence, not proof of an actual CPU-critical event.
 
 ---
 
 ### H. Automated Test Results
 
-[![Automated Test Results](screenshots/08_test_results.png)](screenshots/08_test_results.png)
+![JEMI Automated Test Results](screenshots/08_test_results.png)
 
-**What it demonstrates:** Terminal execution of `python -m pytest -v` with all 10 unit and integration tests passing successfully (100% pass rate in 3.35s).
-
-[🔍 View Full-Size Screenshot](screenshots/08_test_results.png)
+**What it demonstrates:** The captured output of the Python test suite. The number of passing tests must match the screenshot.
 
 ---
 
 ### I. Git Commit History
 
-[![Git Commit History](screenshots/09_git_commit_history.png)](screenshots/09_git_commit_history.png)
+![JEMI Git Commit History](screenshots/09_git_commit_history.png)
 
-**What it demonstrates:** Terminal audit of repository commit history, clean Git working tree, and synchronized branch status with `origin/main`.
-
-[🔍 View Full-Size Screenshot](screenshots/09_git_commit_history.png)
+**What it demonstrates:** Git commit history and repository status at the time of capture.
 
 ---
 
 ### J. GitHub Actions CI
 
-[![GitHub Actions CI](screenshots/10_github_actions.png)](screenshots/10_github_actions.png)
+![JEMI GitHub Actions CI](screenshots/10_github_actions.png)
 
-**What it demonstrates:** Live GitHub Actions workflow run `39582493325` on commit `006f0ff` executing and passing on Ubuntu Linux in 16 seconds.
-
-[🔍 View Full-Size Screenshot](screenshots/10_github_actions.png)
+**What it demonstrates:** The actual GitHub Actions workflow run and its result. Verify the commit and run details against GitHub.
 
 ---
 
+### K. Docker Containers Interface
 
+![JEMI Docker Containers](screenshots/11_docker_containers.png)
 
-### K. Jenkins CI Server & Pipeline Suite
-
-![JEMI Jenkins CI Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
-
-**What it demonstrates:** The Jenkins dashboard for the JEMI DevOps Control Center, displaying configured jobs and their actual build statuses.
-
-[🔍 View Full-Size Jenkins Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
-
-
-### L. Docker Desktop Active Container Orchestration
-
-[![Docker Desktop Containers](screenshots/15_docker_desktop_containers.png)](screenshots/15_docker_desktop_containers.png)
-
-**What it demonstrates:** Docker Desktop production engine actively orchestrating the JEMI multi-container stack: `jemi-control-center:latest` mapped to host port `5000:5000` and `redis:7-alpine` mapped to port `6379:6379`, confirming container build and deployment readiness.
-
-[🔍 View Full-Size Screenshot](screenshots/15_docker_desktop_containers.png)
+**What it demonstrates:** The Docker Containers page within JEMI, including its displayed connection status. If Docker is disconnected, this screenshot documents that state rather than a running container.
 
 ---
 
-### M. Docker Engine Integration Audit (JEMI HUD)
+### L. Deployment Center
 
-[![Docker Engine Integration Audit](screenshots/11_docker_containers.png)](screenshots/11_docker_containers.png)
+![JEMI Deployment Center](screenshots/12_deployment_center.png)
 
-**What it demonstrates:** Live JEMI Control Center HUD Docker Containers view (`http://127.0.0.1:5000/#docker`) actively probing host Docker Engine connectivity. It displays the connection path (`This page` &rarr; `Flask backend` &rarr; `Docker Engine API` &rarr; `Containers`) and transparently reports `DOCKER NOT CONNECTED` with `N/A` counts, verifying authentic host probing without mocking or fabricating container status.
-
-[🔍 View Full-Size Screenshot](screenshots/11_docker_containers.png)
+**What it demonstrates:** The deployment lifecycle, release history, and configuration status displayed by JEMI.
 
 ---
 
-### N. Deployment Center Pipeline View
+### M. GitHub Actions Integration Page
 
-[![Deployment Center Pipeline View](screenshots/12_deployment_center.png)](screenshots/12_deployment_center.png)
+![JEMI GitHub Actions Integration](screenshots/13_github_actions_page.png)
 
-**What it demonstrates:** The JEMI Deployment Center interface (`http://127.0.0.1:5000/#deploy`) illustrating the end-to-end continuous delivery release lifecycle (`Source` &rarr; `Test` &rarr; `Build` &rarr; `Package` &rarr; `Deploy` &rarr; `Health check`), along with release audit history and telemetry status.
-
-[🔍 View Full-Size Screenshot](screenshots/12_deployment_center.png)
+**What it demonstrates:** The GitHub Actions integration page inside the JEMI application. This is separate from the actual GitHub Actions run shown in Section J.
 
 ---
 
-### O. GitHub Actions Status View
+### N. Settings and Integration Diagnostics
 
-[![GitHub Actions Status View](screenshots/13_github_actions_page.png)](screenshots/13_github_actions_page.png)
+![JEMI Settings and Integration Diagnostics](screenshots/14_settings_integrations.png)
 
-**What it demonstrates:** The JEMI GitHub Actions view (`http://127.0.0.1:5000/#pipeline`) presenting the automated CI workflow build lifecycle stages (`Checkout` &rarr; `Install` &rarr; `Test` &rarr; `Build` &rarr; `Report`) and workflow audit records.
-
-[🔍 View Full-Size Screenshot](screenshots/13_github_actions_page.png)
+**What it demonstrates:** Appearance preferences, monitoring settings, and integration statuses displayed by the JEMI Settings page.
 
 ---
 
-### P. Settings & Integrations Diagnostic
+### O. Docker Desktop Container Evidence
 
-[![Settings & Integrations Diagnostic](screenshots/14_settings_integrations.png)](screenshots/14_settings_integrations.png)
+![JEMI Docker Desktop Containers](screenshots/15_docker_desktop_containers.png)
 
-**What it demonstrates:** The live Settings and Diagnostics panel (`http://127.0.0.1:5000/#settings`) running in Google Chrome, verifying live endpoint connectivity status: Flask backend (`Connected`), system metrics endpoint (`Connected`), incident data source (`Connected`), and theme customization controls.
-
-[🔍 View Full-Size Screenshot](screenshots/14_settings_integrations.png)
+**What it demonstrates:** Docker Desktop as captured on the development machine. Claim successful JEMI container deployment only if the actual JEMI container, status, and published port are visible.
 
 ---
 
-### Q. Historical Development Milestones (Uploaded Evidence)
+### P. Jenkins CI Pipeline Dashboard
 
+![JEMI Jenkins Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
+
+**What it demonstrates:** The Jenkins dashboard captured from the actual Jenkins instance. Use it as evidence of JEMI CI jobs only if the displayed jobs and their statuses are genuine.
+
+---
+
+### Q. Historical Development Milestones
+
+These images document earlier development stages. They do not replace evidence of the current test suite or current CI status.
+
+#### Q1. Initial Git Commit
+
+![Initial Git Commit](screenshots/initial_git_commit.png)
+
+**What it demonstrates:** Initial repository setup and the first recorded commit.
+
+#### Q2. Original Three Unit Tests
+
+![Original Three Unit Tests](screenshots/original_three_unit_tests.png)
+
+**What it demonstrates:** The original three-test baseline, before the expanded test suite.
+
+#### Q3. GitHub Actions Workflow Setup
+
+![GitHub Actions Workflow Setup](screenshots/github_actions_workflow_setup.png)
+
+**What it demonstrates:** Earlier workflow configuration and repository setup. It does not establish that the current workflow passes.
+
+#### Q4. GitHub Repository Setup
+
+![GitHub Repository Setup](screenshots/github_repository_page.png)
+
+**What it demonstrates:** The repository's earlier setup state.
+
+#### Q5. Git Hygiene and Tracking Rules
+
+![Git Hygiene Evidence](screenshots/git_remote_sync_evidence.png)
+
+**What it demonstrates:** Earlier inspection of `.gitignore` rules for virtual environments, caches, and local secrets.
+
+---
+
+## 15. Evidence Verification Notes
+
+- Every referenced image must exist in the `screenshots/` directory.
+- Screenshots must be genuine captures of the relevant application or tool.
+- Historical screenshots represent earlier development stages.
+- API responses and test results should be checked against the current project.
+- A Docker interface is not proof of a running container unless the actual container is shown running.
+- A Jenkins dashboard is not proof of a successful build unless the actual build result is visible.
+- Replace missing, invalid, or misleading screenshots before submission.
 #### 11. Initial Git Commit
 [![Initial Git Commit](screenshots/initial_git_commit.png)](screenshots/initial_git_commit.png)  
 **What it demonstrates:** Initial repository commit (`6cd7723`), author attribution (`Aryan Kamble`), and initial tracking of project assets. *(Scope: Local Git initialization; does not reflect subsequent feature development).*  
