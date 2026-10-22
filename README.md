@@ -637,7 +637,7 @@ This visual gallery presents verified evidence captures from the running applica
 
 **What it demonstrates:** Verified local Jenkins Windows Service active and authenticated on `http://localhost:8080/login`, ingesting and running declarative [`Jenkinsfile`](Jenkinsfile) workflows.
 
-[🔍 View Full-Size Login Screenshot](screenshots/jenkins_login.png)
+
 
 ---
 
