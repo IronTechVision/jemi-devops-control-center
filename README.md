@@ -626,31 +626,15 @@ This visual gallery presents verified evidence captures from the running applica
 ---
 
 
+
 ### K. Jenkins CI Server & Pipeline Suite
 
-[![JEMI Jenkins CI Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)](screenshots/16_jenkins_pipeline_dashboard.png)
+![JEMI Jenkins CI Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
 
-**What it demonstrates:** The Jenkins dashboard for the JEMI DevOps Control Center, showing configured CI/CD jobs, build status, and pipeline activity. This screenshot should reflect the actual Jenkins instance and jobs that have been configured.
+**What it demonstrates:** The Jenkins dashboard for the JEMI DevOps Control Center, displaying configured jobs and their actual build statuses.
 
 [🔍 View Full-Size Jenkins Pipeline Dashboard](screenshots/16_jenkins_pipeline_dashboard.png)
 
-#### Jenkins Pipeline Build Results
-
-[![JEMI Jenkins Pipeline Build Results](screenshots/17_jenkins_build_results.png)](screenshots/17_jenkins_build_results.png)
-
-**What it demonstrates:** The actual Jenkins pipeline execution, including checkout, dependency installation, automated tests, and Docker image build stages where configured.
-
-[🔍 View Full-Size Jenkins Build Results](screenshots/17_jenkins_build_results.png)
-
-#### Jenkins Test Results
-
-[![JEMI Jenkins Test Results](screenshots/18_jenkins_test_results.png)](screenshots/18_jenkins_test_results.png)
-
-**What it demonstrates:** Test results published by Jenkins, showing the actual number of passed, failed, or skipped tests.
-
-
-
----
 
 ### L. Docker Desktop Active Container Orchestration
 
